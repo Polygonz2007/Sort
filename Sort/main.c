@@ -46,7 +46,7 @@ int main() {
 			DrawRectangle(i * bar_width, window_y - n, bar_width, n, bar_color);
 		}
 
-		if (IsKeyDown(KEY_S))
+		if (IsKeyPressed(KEY_S))
 			shuffle(data);
 
 		if (IsKeyPressed(KEY_R))
@@ -114,7 +114,7 @@ int bubble_sort(uint16_t *data) {
 		}
 	}
 
-	printf("Time spenst: %fs\n", GetTime() - start);
+	printf("Time spent: %fs\n", GetTime() - start);
 
 	return 0;
 }
