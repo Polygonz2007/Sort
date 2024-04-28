@@ -5,7 +5,7 @@
 
 #include <raylib.h>
 
-#define NUM_ENTRIES 1000
+#define NUM_ENTRIES 10000
 
 
 // Proto
@@ -103,6 +103,7 @@ int bubble_sort(uint16_t *data) {
 	for (uint32_t i = 1; i < NUM_ENTRIES; ++i) {
 
 		// Iteration
+		uint32_t swaps = 0;
 		for (uint32_t j = 0; j < NUM_ENTRIES - i; ++j) {
 			const uint16_t c = data[j];
 			const uint16_t n = data[j + 1];
@@ -110,8 +111,12 @@ int bubble_sort(uint16_t *data) {
 			if (c > n) {
 				data[j] = n;
 				data[j + 1] = c;
+				swaps++;
 			}
 		}
+
+		if (swaps == 0)
+			break;
 	}
 
 	printf("Time spent: %fs\n", GetTime() - start);
