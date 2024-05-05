@@ -66,6 +66,9 @@ int main() {
 	// Settings
 	const float bar_scale = 0.01f;
 	const int bar_width = 1;
+	const uint8_t scroll_speed = 2;
+	uint32_t scroll_pos = 0;
+	uint8_t zoom_factor = 1;
 	const Color bar_color = BLACK;
 
 	// Sorting
@@ -88,14 +91,34 @@ int main() {
 		BeginDrawing();
 
 		ClearBackground(WHITE);
-		DrawText("Sorter", 12, 12, 32, BLACK);
+		DrawText("Polysort", 12, 12, 32, BLACK);
 
 		// Lines
-		for (uint32_t i = 0; i < NUM_ENTRIES; ++i) {
-			uint32_t n = (int)(data[i] * bar_scale);
-			DrawRectangle(i * bar_width, window_y - n, bar_width, n, bar_color);
+		uint16_t sp = 0;
+		for (uint32_t i = scroll_pos; i < scroll_pos + window_x; ++i) {
+			if (i * zoom_factor >= NUM_ENTRIES)
+				continue;
+
+			const uint32_t n = (int)(data[i * zoom_factor] * bar_scale);
+			DrawRectangle(sp * bar_width, window_y - n, bar_width, n, bar_color);
+			sp++;
 		}
 
+		// Navigation
+		if (IsKeyDown(KEY_RIGHT))
+			scroll_pos += scroll_speed;
+
+		if (IsKeyDown(KEY_LEFT) && scroll_pos > 0)
+			scroll_pos -= scroll_speed;
+
+		if (IsKeyPressed(KEY_Z) && zoom_factor < 127)
+			zoom_factor *= 2;
+		if (IsKeyPressed(KEY_X) && zoom_factor > 1)
+			zoom_factor *= 0.5f;
+
+
+
+		// Sorts
 		if (IsKeyPressed(KEY_S)) {
 			*current_sort = "shuffle";
 			sort_h_thread = CreateThread(NULL, 0, run_sort, 0, 0, &sort_dw_thread_id);
@@ -112,6 +135,18 @@ int main() {
 			sort_h_thread = CreateThread(NULL, 0, run_sort, 0, 0, &sort_dw_thread_id);
 		}
 
+
+
+		// Info Text
+		char zoom_t[16];
+		snprintf(zoom_t, 15, "Zoom: %dx", zoom_factor);
+		DrawText(zoom_t, 10, 52, 20, DARKBLUE);
+
+		char pos_t[32];
+		snprintf(pos_t, 31, "Scroll Position: %d", scroll_pos);
+		DrawText(pos_t, 10, 72, 20, DARKGREEN);
+
+
 		EndDrawing();
 	}
 
@@ -123,7 +158,7 @@ int randomize() {
 	srand(GetTime() * 100.0f);
 	for (uint32_t i = 0; i < NUM_ENTRIES; ++i) {
 		data[i] = rand();
-		WaitTime(0.0001f);
+		//WaitTime(0.0001f);
 	}
 
 	return 0;
@@ -137,7 +172,7 @@ int shuffle() {
 		data[pick] = data[i];
 		data[i] = p;
 
-		WaitTime(0.0001f);
+		//WaitTime(0.0001f);
 	}
 
 	return 0;
@@ -203,7 +238,7 @@ int bubble_sort() {
 				data[j + 1] = c;
 				swaps++;
 
-				WaitTime(0.00001f);
+				//WaitTime(0.000001f);
 			}
 		}
 
